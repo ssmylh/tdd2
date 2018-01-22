@@ -3,29 +3,26 @@ class TestCase:
         self.name = name
     def setUp(self):
         pass
+    def tearDown(self):
+        pass
     def run(self):
         self.setUp()
         method = getattr(self, self.name)
         method()
+        self.tearDown()
 
 class WasRun(TestCase):
     def setUp(self):
-        self.wasRun = None
-        self.wasSetUp = 1
+        self.log = "setUp "
     def testMethod(self):
-        self.wasRun = 1
+        self.log += "testMethod "
+    def tearDown(self):
+        self.log += "tearDown "
 
 class TestCaseTest(TestCase):
-    def setUp(self):
-        self.test = WasRun("testMethod")
-    def testRunning(self):
-        self.test.run()
-        assert(self.test.wasRun)
-    def testSetUp(self):
-        self.test.run()
-        assert(self.test.wasSetUp)
+    def testTemplateMethod(self):
+        test = WasRun("testMethod")
+        test.run()
+        assert("setUp testMethod tearDown " == test.log)
 
-# TestCaseTestでは内部でTestCaseインスタンスをメソッド間で共有するので、
-# TestCaseTestはテスト毎にインスタンス化する
-TestCaseTest("testRunning").run()
-TestCaseTest("testSetUp").run()
+TestCaseTest("testTemplateMethod").run()
